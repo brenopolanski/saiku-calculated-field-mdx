@@ -1,4 +1,3 @@
-saiku-calculated-field-mdx
-==========================
+# Saiku Calculated Field MDX
 
-IN DEVELOPMENT :v:
+> Under construction, come back later ;)
