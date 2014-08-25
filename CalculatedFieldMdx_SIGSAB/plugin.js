@@ -10,8 +10,8 @@ var CalculatedFieldMdx = Backbone.View.extend({
 		// Keep track of parent workspace
 		this.workspace = args.workspace;
 
-		// Create a ID for use as the CSS selector
-        this.id = 'calculated-field-mdx';
+		// Create a class for use as the CSS selector
+        this.class = 'calculatedfieldmdx';
         this.$el.attr({ id: this.id });
 
 		// Base URL

@@ -1,5 +1,5 @@
 var CalculatedFieldMdxDialog = Modal.extend({
-    type: 'filtermdx',
+    type: 'calculatedfieldmdx',
 
     events: {
         'click .add-to-exp': 'logical_expression',
@@ -12,113 +12,134 @@ var CalculatedFieldMdxDialog = Modal.extend({
     ],
     
     initialize: function(args) {
-        this.options.title = 'Filtro';
+        this.options.title = 'Campo Calculado';
+
+        console.log(args.workspace.calculatedFieldMdx);
 
         // Keep track of parent workspace
 		this.workspace = args.workspace;
 	
-	if (args.data !== undefined) {
+		if (args.data !== undefined) {
 
-        // set this.data with object of plugin.js
-    	this.data = args.data;
+	        // set this.data with object of plugin.js
+	    	this.data = args.data;
 
-    	// Reset objects MDX's
-    	this.data.exp = '';
-    	this.data.tplmdx = '';
+	    	// Reset objects MDX's
+	    	this.data.exp = '';
+	    	this.data.tplmdx = '';
 
-        this.message = _.template(
-			'<div class="container_12">' +
-				// #1
-				'<div class="grid_5">' +
-					'<div class="filtermdx-form">' +
-						'<label for="">Variável</label>' +
-						'<select class="form-control" name="select-var" id="select-var">' +
-							'<option value="">-- Selecione --</option>' +
-							'<% _.each(args.data.metadata, function(val) { %>' +
-							'<option value="<%= val.properties.uniquename %>"><%= val.colName %></option>' +
-							'<% }); %>' +
-						'</select>' +
+	        this.message = _.template(
+				'<div class="container_12">' +
+					// #1
+					'<div class="grid_5">' +
+						'<div class="'+ args.class +'-form">' +
+							'<label for="">Nome da variável de saída</label>' +
+							'<input type="text" class="form-control" name="" id="">' +
+						'</div>' +
 					'</div>' +
-				'</div>' +
-				'<div class="grid_1" style="margin-top: 18px;">' +
-					'<div class="filtermdx-form">' +
-						'<button class="form-control add-to-exp" name="add-var" id="add-var">add</button>' +
+					'<div class="grid_1" style="margin-top: 18px;">' +
+						'<div class="'+ args.class +'-form">' +
+							'<button class="form-control add-to-exp" name="add-var" id="add-var">add</button>' +
+						'</div>' +
 					'</div>' +
-				'</div>' +
 
-				'<div class="grid_5">' +
-					'<div class="filtermdx-form">' +
-						'<label for="">Digite um valor</label>' +
-						'<input type="text" class="form-control" name="input-val" id="input-val">' +
+					'<div class="grid_5">' +
+						'<div class="'+ args.class +'-form">' +
+							'<label for="">Tipo da variável de saída</label>' +
+							'<select class="form-control" name="" id="">' +
+								'<option value="">-- Selecione --</option>' +
+								'<option value="string">String</option>' +
+								'<option value="inteiro">Inteiro</option>' +
+							'</select>' +
+						'</div>' +
 					'</div>' +
-				'</div>' +
-				'<div class="grid_1" style="margin-top: 18px;">' +
-					'<div class="filtermdx-form">' +
-						'<button class="form-control add-to-exp" name="add-ano" id="add-ano">add</button>' +
+					'<div class="grid_1" style="margin-top: 18px;">' +
+						'<div class="'+ args.class +'-form">' +
+							'<button class="form-control add-to-exp" name="add-ano" id="add-ano">add</button>' +
+						'</div>' +
 					'</div>' +
-				'</div>' +
-				// #2
-				'<div class="grid_5">' +
-					'<div class="filtermdx-form">' +
-						'<label for="">Lista de operadores lógicos</label>' +
-						'<select class="form-control" name="select-log" id="select-log">' +
-							'<option value="">-- Selecione --</option>' +
-							'<option value="=">Igual (=)</option>' +
-							'<option value="<>">Diferente (<>)</option>' +
-							'<option value=">">Maior (>)</option>' +
-							'<option value="<">Menor (<)</option>' +
-							'<option value=">=">Maior ou igual (>=)</option>' +
-							'<option value="<=">Menor ou igual (<=)</option>' +
-							'<option value="AND">AND</option>' +
-							'<option value="OR">OR</option>' +
-						'</select>' +
+					// #2
+					'<div class="grid_5">' +
+						'<div class="'+ args.class +'-form">' +
+							'<label for="">Selecione variável para inserir na expressão</label>' +
+							'<select class="form-control" name="select-var" id="select-var">' +
+								'<option value="">-- Selecione --</option>' +
+								'<% _.each(args.data.metadata, function(val) { %>' +
+								'<option value="<%= val.properties.uniquename %>"><%= val.colName %></option>' +
+								'<% }); %>' +
+							'</select>' +
+						'</div>' +
 					'</div>' +
-				'</div>' +
-				'<div class="grid_1" style="margin-top: 18px;">' +
-					'<div class="filtermdx-form">' +
-						'<button class="form-control add-to-exp" name="add-log" id="add-log">add</button>' +
+					'<div class="grid_1" style="margin-top: 18px;">' +
+						'<div class="'+ args.class +'-form">' +
+							'<button class="form-control add-to-exp" name="add-log" id="add-log">add</button>' +
+						'</div>' +
 					'</div>' +
-				'</div>' +
 
-				'<div class="grid_5">' +
-					'<div class="filtermdx-form">' +
-						'<label for="">Digite um valor</label>' +
-						'<input type="text" class="form-control" name="input-val" id="input-val">' +
+					'<div class="grid_5">' +
+						'<div class="'+ args.class +'-form">' +
+							'<label for="">Lista de funções</label>' +
+							'<select class="form-control" name="select-func" id="select-func">' +
+								'<option value="">-- Selecione --</option>' +
+								'<option value="and">AND</option>' +
+								'<option value="or">OR</option>' +
+								'<option value="not">NOT</option>' +
+								'<option value="/">Divisão (/)</option>' +
+								'<option value="*">Multiplicação (*)</option>' +
+								'<option value="+">Soma (+)</option>' +
+								'<option value="-">Subtração (-)</option>' +
+								'<option value="^">Raiz (^)</option>' +
+								'<option value="round">Arredonda</option>' +
+								'<option value="avg">Média</option>' +
+								'<option value="max">Máximo</option>' +
+								'<option value="min">Mínimo</option>' +
+								'<option value="median">Mediana</option>' +
+								'<option value="stdev">Desvio Padrão</option>' +
+								'<option value="var">Variância</option>' +
+							'</select>' +
+						'</div>' +
 					'</div>' +
-				'</div>' +
-				'<div class="grid_1" style="margin-top: 18px;">' +
-					'<div class="filtermdx-form">' +
-						'<button class="form-control add-to-exp" name="add-val" id="add-val">add</button>' +
+					'<div class="grid_1" style="margin-top: 18px;">' +
+						'<div class="'+ args.class +'-form">' +
+							'<button class="form-control add-to-exp" name="add-val" id="add-val">add</button>' +
+						'</div>' +
 					'</div>' +
-				'</div>' +
-				// #3
-				'<div class="grid_12">' +
-					'<div class="filtermdx-form">' +
-						'<div id="editor-mdx"></div>' +
+					// #3
+					'<div class="grid_12">' +
+						'<div class="'+ args.class +'-form">' +
+							'<div id="editor-mdx"></div>' +
+						'</div>' +
 					'</div>' +
-				'</div>' +
-				// #4
-				'<div class="grid_12">' +
-					'<p>Prévia de saída:</p>' +
-				'</div>' +
-			'</div>'
-		)({ args: args });
+					// #4
+					'<div class="grid_12">' +
+						// TODO: Implementar depois.. depois...
+						// Aqui seria para testar a expressão em tempo de execução e
+						// mostrar ao usuário se a expressão está correta ou não.
+						// '<p>Prévia de saída:</p>' +
+						'<p>&nbsp;</p>' +
+					'</div>' +
+				'</div>'
+			)({ args: args });
 
-        this.bind('open', function() {
-       		var self = this;
-        	$(self.el).parents('.ui-dialog').css({ width: '550px' });
-        });
+	        this.bind('open', function() {
+	       		var self = this;
 
-        // Maintain `this` in callbacks
-		_.bindAll(this, 'start_editor', 'logical_expression', 'split_mdx', 'create_exp_filter',
-			      'run_exp_filter');
+	       		// TODO: Centralizar modal
 
-		// start editor MDX
-		_.delay(this.start_editor, 1000);
+	       		$(self.el).dialog('option', 'position', 'center');
+	        	$(self.el).parents('.ui-dialog').css({ width: '650px' });
+	        });
 
-		// split expression MDX
-		this.split_mdx();
-	}
+	        // Maintain `this` in callbacks
+			_.bindAll(this, 'start_editor', 'logical_expression', 'split_mdx', 'create_exp_filter',
+				      'run_exp_filter');
+
+			// start editor MDX
+			_.delay(this.start_editor, 1000);
+
+			// split expression MDX
+			this.split_mdx();
+		}
     },
 
     start_editor: function() {
