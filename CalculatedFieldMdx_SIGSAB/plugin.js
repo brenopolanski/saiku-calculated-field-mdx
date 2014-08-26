@@ -129,7 +129,6 @@ var CalculatedFieldMdx = Backbone.View.extend({
         	this.data.height = ROWS;
     		this.data.width = COLUMNS;
         	
-        	// 
         	this.set_localstorage_mdx();
         }
         else {
