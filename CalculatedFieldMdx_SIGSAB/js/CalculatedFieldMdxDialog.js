@@ -232,7 +232,7 @@ var CalculatedFieldMdxDialog = Modal.extend({
 
 	        // Maintain `this` in callbacks
 			_.bindAll(this, 'start_editor', 'logical_expression', 'split_mdx', 'create_exp',
-				      'run_exp_filter');
+				      'run_exp');
 
 			// start editor MDX
 			_.delay(this.start_editor, 1000);
@@ -361,17 +361,14 @@ var CalculatedFieldMdxDialog = Modal.extend({
     },
 
     create_exp: function() {
-    	var nameVarOutput = '([Variavel].[' + this.$el.find('#input-var-output').val() + '])';	
-		var logExp = { logical_expression: this.editor.getValue() };
+    	console.log(this.editor.selection.getCursor());
 
-		// if (this.data.swap_var === 'rows') {
-	 //    	this.data.tplmdx = 'NON EMPTY FILTER(' + this.data.tplmdx + ', {logical_expression})' + ' ON COLUMNS,';
-	 //    }
-	 //    else {
-	 //    	this.data.tplmdx = 'NON EMPTY FILTER(' + this.data.tplmdx + ', {logical_expression})' + ' ON ROWS';
-	 //    }
+    	this.data.exp = this.editor.getValue();
 
-	 	// this.data.tplmdx = 'WITH MEMBER ' + nameVarOutput + 'AS ' + '{logical_expression}';
+    	var nameVarOutput = '[Variavel].[' + this.$el.find('#input-var-output').val() + ']';	
+		var logExp = { logical_expression: this.data.exp };
+
+		this.data.tplmember = 'WITH MEMBER ' + nameVarOutput + ' AS ' + '{logical_expression}';
 
 	 	if (this.data.swap_var === 'rows') {
 	    	this.data.tplmdx = 'NON EMPTY ' + this.data.tplmdx + ', ' + nameVarOutput + '} ON ROWS';
@@ -380,48 +377,33 @@ var CalculatedFieldMdxDialog = Modal.extend({
 	    	this.data.tplmdx = 'NON EMPTY ' + this.data.tplmdx + ', ' + nameVarOutput + '} ON COLUMNS,';
 	    }
 
+		this.data.tplmember = this.data.tplmember.replace(/{(\w+)}/g, function(m, p) {
+			return logExp[p];
+		});
 
+    	if (this.data.swap_var === 'rows') {
+    		this.data.mdx[2] = this.data.tplmdx;
+    	}
+    	else {
+    		this.data.mdx[1] = this.data.tplmdx;
+    	}
 
+    	this.data.tplmdx = '';
 
+    	for (var i in this.data.mdx) {
+    		if (this.data.mdx.hasOwnProperty(i)) {
+				this.data.tplmdx += this.data.mdx[i].concat(' ');	
+    		}
+    	}
 
+    	this.data.tplmdx = this.data.tplmember + '\n' + this.data.tplmdx;
 
-
-
-
-
-
-
-
-
-
-
-
-
-		// this.data.tplmdx = this.data.tplmdx.replace(/{(\w+)}/g, function(m, p) {
-		// 	return logExp[p];
-		// });
-
-  //   	if (this.data.swap_var === 'rows') {
-  //   		this.data.mdx[1] = this.data.tplmdx;
-  //   	}
-  //   	else {
-  //   		this.data.mdx[2] = this.data.tplmdx;
-  //   	}
-
-  //   	this.data.tplmdx = '';
-
-  //   	for (var i in this.data.mdx) {
-  //   		if (this.data.mdx.hasOwnProperty(i)) {
-		// 		this.data.tplmdx += this.data.mdx[i].concat(' ');	
-  //   		}
-  //   	}
-
-		// _.delay(this.run_exp_filter, 500);
+		_.delay(this.run_exp, 500);
 
 		console.log(this.data);
     },
 
-    run_exp_filter: function() {
+    run_exp: function() {
     	this.workspace.query.set({ type: 'MDX', formatter: 'flat' });
 
     	this.workspace.query.run(true, this.data.tplmdx);

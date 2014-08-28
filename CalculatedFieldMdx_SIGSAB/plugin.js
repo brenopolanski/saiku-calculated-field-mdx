@@ -71,6 +71,7 @@ var CalculatedFieldMdx = Backbone.View.extend({
         		swap_var: '',
 				exp: '',
 				mdx: '',
+                tplmember: '',
 				tplmdx: '',
 	        	width: 0,
 	        	height: 0
